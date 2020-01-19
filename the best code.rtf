@@ -1,0 +1,486 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil Consolas;}{\f1\fnil\fcharset0 Calibri;}}
+{\colortbl ;\red0\green128\blue0;\red0\green0\blue0;\red128\green128\blue128;\red163\green21\blue21;\red0\green0\blue255;\red43\green145\blue175;\red0\green128\blue128;}
+{\*\generator Riched20 10.0.17134}\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\cf1\f0\fs19\lang9 // harsh fianl project.cpp : This file contains the 'main' function. Program execution begins and ends there.\cf2\par
+\cf1 //\cf2\par
+\par
+\cf3 #include\cf2  \cf4 "pch.h"\cf2\par
+\cf3 #include\cf2  \cf4 <iostream>\cf2\par
+\par
+\cf1 //this is the world bank of Hedia Credit\cf2\par
+\cf3 #include\cf4 <iostream>\cf2\par
+\cf3 #include\cf2  \cf4 <string>\cf2\par
+\cf3 #include\cf4 <ctime>\cf2\par
+\cf3 #include\cf4 <vector>\cf2\par
+\cf3 #include\cf2  \cf4 <fstream>\cf2\par
+\cf3 #include\cf2  \cf4 <stdlib.h>\cf2\par
+\cf1 //make clear screen...\cf2\par
+\cf3 #include\cf4 <stdio.h>\cf2\par
+\cf3 #include\cf4 <stdlib.h>\cf2\par
+\par
+\cf5 using\cf2  \cf5 namespace\cf2  std;\par
+\cf5 char\cf2  name[20];\par
+\cf1 //the blockchain will have 3 main components:\cf2\par
+\cf1 //the transaction dats\cf2\par
+\cf1 //the block class\cf2\par
+\cf1 //the blockchain class\cf2\par
+\par
+\par
+\cf1 //transaction data\cf2\par
+\par
+\par
+\cf5 struct\cf2  \cf6 transaction_data\cf2\par
+\{\par
+\tab\cf5 float\cf2  amount;\par
+\tab\cf6 string\cf2  sender;\par
+\tab\cf6 string\cf2  receiver;\par
+\tab\cf6 time_t\cf2  timestamp;\par
+\};\par
+\par
+\par
+\cf1 //block class\cf2\par
+\cf5 class\cf2  \cf6 block\cf2\par
+\{\par
+\cf5 private\cf2 :\par
+\tab\cf5 int\cf2  index;\par
+\tab\cf6 size_t\cf2  blockHash;           \cf1 //size_t is an unsigned integer type. this is what is returned when the standard library's hash function is used\cf2\par
+\tab\cf6 size_t\cf2  previousHash;\par
+\tab\cf6 size_t\cf2  generateHash()\par
+\tab\{\par
+\tab\tab\cf6 hash\cf2 <\cf6 string\cf2 > hash1;\par
+\tab\tab\cf6 hash\cf2 <\cf6 size_t\cf2 > hash2;\par
+\tab\tab\cf6 hash\cf2 <\cf6 size_t\cf2 > finalhash;\par
+\tab\tab\cf6 string\cf2  to_hash = to_string(data.amount) \cf7 +\cf2  data.receiver \cf7 +\cf2  data.sender \cf7 +\cf2  to_string(data.timestamp);\par
+\tab\tab\cf5 return\cf2  finalhash\cf7 (\cf2 hash1\cf7 (\cf2 to_hash\cf7 )\cf2  + hash2\cf7 (\cf2 previousHash\cf7 ))\cf2 ;\par
+\par
+\par
+\par
+\tab\};\par
+\par
+\cf5 public\cf2 :\par
+\tab\cf1 //constructor\cf2\par
+\tab block(\cf5 int\cf2  \cf3 idx\cf2 , \cf6 transaction_data\cf2  \cf3 d\cf2 , \cf6 size_t\cf2  \cf3 prevHash\cf2 )\par
+\tab\{\par
+\tab\tab index = \cf3 idx\cf2 ;\par
+\tab\tab data \cf7 =\cf2  \cf3 d\cf2 ;\par
+\tab\tab previousHash = \cf3 prevHash\cf2 ;\par
+\tab\tab blockHash = generateHash();\par
+\par
+\par
+\par
+\tab\};\par
+\par
+\tab\cf1 //to get original hash\cf2\par
+\tab\cf6 size_t\cf2  getHash()\par
+\tab\{\par
+\tab\tab\cf5 return\cf2  blockHash;\par
+\par
+\tab\}\par
+\par
+\tab\cf1 //to get previous hash\cf2\par
+\tab\cf6 size_t\cf2  getpreviousHash()\par
+\tab\{\par
+\tab\tab\cf5 return\cf2  previousHash;\par
+\par
+\tab\}\par
+\par
+\tab\cf1 //trasaction data\cf2\par
+\tab\cf6 transaction_data\cf2  data;\par
+\par
+\tab\cf1 //to check if the hash is valid\cf2\par
+\tab\cf5 bool\cf2  isHashValid()\par
+\tab\{\par
+\tab\tab\cf5 return\cf2  generateHash() == blockHash;\par
+\par
+\tab\}\par
+\par
+\par
+\};\par
+\par
+\cf1 //blockchain class\cf2\par
+\cf5 class\cf2  \cf6 blockchain\cf2\par
+\{\par
+\cf5 private\cf2 :\par
+\tab\cf6 block\cf2  createGenesisBlock()          \cf1 //genesis block is the first block of the blockchain\cf2\par
+\tab\{\par
+\tab\tab\cf6 time_t\cf2  current;\par
+\tab\tab\cf6 transaction_data\cf2  d;\par
+\tab\tab d.amount = 0;\par
+\tab\tab d.receiver \cf7 =\cf2  \cf4 "None"\cf2 ;\par
+\tab\tab d.sender \cf7 =\cf2  \cf4 "None"\cf2 ;\par
+\tab\tab d.timestamp = time(&current);\par
+\par
+\tab\tab\cf6 hash\cf2 <\cf5 int\cf2 > hash1;\par
+\tab\tab\cf6 block\cf2  genesis(0, d, hash1\cf7 (\cf2 0\cf7 )\cf2 );\par
+\tab\tab\cf5 return\cf2  genesis;\par
+\par
+\par
+\tab\}\par
+\cf5 public\cf2 :\par
+\tab\cf1 //public chain\cf2\par
+\tab\cf6 vector\cf2 <\cf6 block\cf2 > chain;    \cf1 //Vectors are same as dynamic arrays with the ability to resize itself automatically when an element is inserted or deleted, with their storage being handled automatically by the container. Vector elements are placed in contiguous storage so that they can be accessed and traversed using iterators.\cf2\par
+\tab\cf6 block\cf2 * get_latest_block();\par
+\par
+\tab\cf1 //constructor\cf2\par
+\tab blockchain()\par
+\tab\{\par
+\tab\tab\cf6 block\cf2  genesis = createGenesisBlock();\par
+\tab\tab chain.push_back(genesis);\par
+\par
+\tab\}\par
+\tab\cf1 //now lets make public functions\cf2\par
+\tab\cf5 void\cf2  addBlock(\cf6 transaction_data\cf2  \cf3 d\cf2 )\par
+\tab\{\par
+\tab\tab\cf5 int\cf2  index = (\cf5 int\cf2 )chain.size() - 1;\par
+\tab\tab\cf6 block\cf2  new_block(index, \cf3 d\cf2 , get_latest_block()->getHash());\par
+\par
+\par
+\tab\}\par
+\tab\cf5 bool\cf2  is_chain_valid()\par
+\tab\{\par
+\tab\tab\cf6 vector\cf2 <\cf6 block\cf2 >::\cf6 iterator\cf2  it;\par
+\tab\tab\cf5 int\cf2  chainlen = (\cf5 int\cf2 )chain.size();\par
+\par
+\tab\tab\cf5 for\cf2  (it \cf7 =\cf2  chain.begin(); it \cf7 !=\cf2  chain.end(); it\cf7 ++\cf2 )\par
+\tab\tab\{\par
+\tab\tab\tab\cf6 block\cf2  currentblock = \cf7 *\cf2 it;\par
+\tab\tab\tab\cf5 if\cf2  (!currentblock.isHashValid())\par
+\tab\tab\tab\{\par
+\tab\tab\tab\tab\cf5 return\cf2  \cf5 false\cf2 ;\par
+\par
+\tab\tab\tab\}\par
+\tab\tab\tab\cf5 if\cf2  (chainlen > 1)\par
+\tab\tab\tab\{\par
+\tab\tab\tab\tab\cf6 block\cf2  previousblock = \cf7 *\cf2 (it \cf7 -\cf2  1);\par
+\tab\tab\tab\tab\cf5 if\cf2  (currentblock.getpreviousHash() != previousblock.getHash())\par
+\tab\tab\tab\tab\{\par
+\tab\tab\tab\tab\tab\cf5 return\cf2  \cf5 false\cf2 ;\par
+\par
+\tab\tab\tab\tab\}\par
+\par
+\tab\tab\tab\}\par
+\par
+\par
+\tab\tab\}\par
+\tab\tab\cf5 return\cf2  \cf5 true\cf2 ;\par
+\par
+\tab\}\par
+\par
+\};\par
+\cf6 block\cf2  *\cf6 blockchain\cf2 ::get_latest_block()\par
+\{\par
+\tab\cf5 return\cf2  &chain.back();\par
+\par
+\}\par
+\par
+\par
+\cf5 using\cf2  \cf5 namespace\cf2  std;\par
+\par
+\cf5 int\cf2  main()\par
+\{\par
+\par
+\tab cout \cf7 <<\cf2  \cf4 "\\t\\t\\t\\t!!!!!!WORLD BANK OF HEDIA CREDIT!!!!!!!"\cf2 ;\par
+\tab cout \cf7 <<\cf2  \cf4 "\\n"\cf2 ;\par
+\tab cout \cf7 <<\cf2  \cf4 "\\t\\t\\t\\t$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"\cf2 ;\par
+\tab\cf6 blockchain\cf2  creditcoin;\par
+\tab\cf5 char\cf2  chh;\par
+\tab\cf5 char\cf2  ch[5];\par
+\tab\cf5 int\cf2  i = 0;\par
+\tab\cf5 int\cf2  j = 0;\par
+\tab cout \cf7 <<\cf2  \cf4 "\\nAre you a already a member? (y/n): "\cf2 ;\par
+\tab cin \cf7 >>\cf2  chh;\par
+\tab\cf5 if\cf2  (chh == \cf4 'y'\cf2 )\par
+\tab\{\par
+\tab\tab system(\cf4 "cls"\cf2 );\par
+\par
+\par
+\tab label2:\par
+\tab\tab cout \cf7 <<\cf2  \cf4 "\\t\\t\\t\\t!!!!!!WORLD BANK OF HEDIA CREDIT!!!!!!!"\cf2 ;\par
+\tab\tab cout \cf7 <<\cf2  \cf4 "\\n"\cf2 ;\par
+\tab\tab cout \cf7 <<\cf2  \cf4 "\\t\\t\\t\\t$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"\cf2 ;\par
+\tab\tab\cf5 int\cf2  l;\par
+\par
+\tab\tab cout \cf7 <<\cf2  \cf4 "\\n1. deposit credit coins "\cf2 ;\par
+\tab\tab cout \cf7 <<\cf2  \cf4 "\\n2. transfer money "\cf2 ;\par
+\tab\tab cout \cf7 <<\cf2  \cf4 "\\n3. make new account "\cf2 ;\par
+\tab\tab cout \cf7 <<\cf2  \cf4 "\\n4. exit"\cf2 ;\par
+\tab\tab cout \cf7 <<\cf2  \cf4 "\\n\\n"\cf2 ;\par
+\tab\tab cout \cf7 <<\cf2  \cf4 "enter choice "\cf2 ;\par
+\tab\tab cin \cf7 >>\cf2  l;\par
+\par
+\tab\tab\cf5 switch\cf2  (l)\par
+\tab\tab\{\par
+\tab\tab\tab\cf5 case\cf2  1:\par
+\tab\tab\tab\tab system(\cf4 "cls"\cf2 );\par
+\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\t\\t\\t\\t!!!!!!WORLD BANK OF HEDIA CREDIT!!!!!!!"\cf2 ;\par
+\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\n"\cf2 ;\par
+\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\t\\t\\t\\t$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"\cf2 ;\par
+\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\n"\cf2 ;\par
+\tab\tab\tab\tab\cf5 goto\cf2  label6;\par
+\tab\tab\tab\tab\cf5 break\cf2 ;\par
+\par
+\par
+\tab\tab\tab\tab\cf5 break\cf2 ;\par
+\tab\tab\tab\cf5 case\cf2  2:\par
+\tab\tab\tab\tab system(\cf4 "cls"\cf2 );\par
+\tab\tab\tab\tab\cf5 goto\cf2  label3;\par
+\tab\tab\tab\tab\cf5 break\cf2 ;\par
+\par
+\tab\tab\tab\cf5 case\cf2  3:\par
+\tab\tab\tab\tab system(\cf4 "cls"\cf2 );\par
+\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\t\\t\\t\\t!!!!!!WORLD BANK OF HEDIA CREDIT!!!!!!!"\cf2 ;\par
+\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\n"\cf2 ;\par
+\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\t\\t\\t\\t$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"\cf2 ;\par
+\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\n"\cf2 ;\par
+\tab\tab\tab\tab\cf5 goto\cf2  label6;\par
+\tab\tab\tab\tab\cf5 break\cf2 ;\par
+\par
+\tab\tab\tab\cf5 case\cf2  4:\par
+\tab\tab\tab\tab system(\cf4 "cls"\cf2 );\par
+\tab\tab\tab\tab\cf5 goto\cf2  label5;\par
+\tab\tab\tab\tab\cf5 break\cf2 ;\par
+\par
+\par
+\par
+\par
+\par
+\par
+\tab\tab\}\par
+\tab label3:\par
+\tab\tab cout \cf7 <<\cf2  \cf4 "\\t\\t\\t\\t!!!!!!WORLD BANK OF HEDIA CREDIT!!!!!!!"\cf2 ;\par
+\tab\tab cout \cf7 <<\cf2  \cf4 "\\n"\cf2 ;\par
+\tab\tab cout \cf7 <<\cf2  \cf4 "\\t\\t\\t\\t$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"\cf2 ;\par
+\tab\tab\cf6 time_t\cf2  data1Time;\par
+\par
+\tab\tab\cf6 transaction_data\cf2  data[10];\par
+\tab\tab\cf5 do\cf2\par
+\tab\tab\{\par
+\tab\tab\tab\par
+\par
+\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\nwho are you "\cf2 ;\par
+\tab\tab\tab cin \cf7 >>\cf2  data[i].sender;\par
+\par
+\tab\tab\tab\cf5 int\cf2  offset;\par
+\tab\tab\tab\cf6 string\cf2  line;\par
+\tab\tab\tab\cf6 string\cf2  name;\par
+\tab\tab\tab\cf5 int\cf2  left;\par
+\tab\tab\tab\cf5 int\cf2  id;\par
+\tab\tab\tab\cf5 int\cf2  money;\par
+\tab\tab\tab\cf6 fstream\cf2  file;\par
+\tab\tab\tab file.open(\cf4 "C:\\\\Users\\\\Manish Panchal\\\\Desktop\\\\users.txt"\cf2 );\par
+\par
+\tab\tab\tab\cf5 if\cf2  (file.is_open())\par
+\tab\tab\tab\{\par
+\tab\tab\tab\tab\cf5 while\cf2  (!file.eof())\par
+\tab\tab\tab\tab\{\par
+\tab\tab\tab\tab\tab getline(file, name);\par
+\tab\tab\tab\tab\tab file \cf7 >>\cf2  id \cf7 >>\cf2  name \cf7 >>\cf2  money;\par
+\par
+\tab\tab\tab\tab\tab\cf5 if\cf2  ((offset = name.find(data[i].sender, 0)) != \cf6 string\cf2 ::npos)\par
+\tab\tab\tab\tab\tab\{\par
+\par
+\tab\tab\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "account found"\cf2 ;\par
+\tab\tab\tab\tab\tab\tab cout \cf7 <<\cf2  endl \cf7 <<\cf2  name \cf7 <<\cf2  \cf4 " has "\cf2  \cf7 <<\cf2  money \cf7 <<\cf2  \cf4 " in his/her hedia credit account"\cf2  \cf7 <<\cf2  endl;\par
+\tab\tab\tab\tab\tab\tab\cf5 if\cf2  (money <= 0)\par
+\tab\tab\tab\tab\tab\tab\{\par
+\tab\tab\tab\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "cannot make a transaction"\cf2 ;\par
+\tab\tab\tab\tab\tab\tab\tab exit(0);\par
+\tab\tab\tab\tab\tab\tab\}\par
+\par
+\tab\tab\tab\tab\tab\tab\cf5 goto\cf2  label1;\par
+\par
+\par
+\par
+\par
+\tab\tab\tab\tab\tab\}\par
+\par
+\par
+\tab\tab\tab\tab\}\par
+\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "sorry could not find account"\cf2 ;\par
+\tab\tab\tab\tab\cf5 int\cf2  c, d;\par
+\par
+\tab\tab\tab\tab\cf5 for\cf2  (c = 1; c <= 32761; c++)\par
+\tab\tab\tab\tab\tab\cf5 for\cf2  (d = 1; d <= 32761; d++)\par
+\tab\tab\tab\tab\tab\{\par
+\tab\tab\tab\tab\tab\}\par
+\tab\tab\tab\tab system(\cf4 "cls"\cf2 );\par
+\tab\tab\tab\tab\par
+\tab\tab\tab\tab file.close();\par
+\par
+\par
+\tab\tab\tab\}\par
+\tab\tab\tab\cf5 else\cf2\par
+\tab\tab\tab\{\par
+\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "file could not open "\cf2 ;\par
+\tab\tab\tab\tab exit(0);\par
+\par
+\tab\tab\tab\}\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\tab\tab\tab\cf5 goto\cf2  label3;\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\tab\tab label1:\par
+\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\nwho do you want to send it to "\cf2 ;\par
+\tab\tab\tab cin \cf7 >>\cf2  data[i].receiver;\par
+\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\nenter amount "\cf2 ;\par
+\tab\tab\tab cin \cf7 >>\cf2  data[i].amount;\par
+\tab\tab\tab\cf5 if\cf2  (money < data[i].amount)\par
+\tab\tab\tab\{\par
+\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "insufficient funds available"\cf2 ;\par
+\tab\tab\tab\tab exit(0);\par
+\tab\tab\tab\}\par
+\tab\tab\tab left = money - data[i].amount;\par
+\tab\tab\tab cout \cf7 <<\cf2  \cf4 "you have "\cf2  \cf7 <<\cf2  left \cf7 <<\cf2  \cf4 " left in your bank account"\cf2  \cf7 <<\cf2  endl;\par
+\tab\tab\tab\cf6 ofstream\cf2  files;\par
+\tab\tab\tab files.open(\cf4 "C:\\\\Users\\\\Manish Panchal\\\\Desktop\\\\users.txt"\cf2 , \cf6 ios\cf2 ::app);\par
+\par
+\par
+\tab\tab\tab files \cf7 <<\cf2  endl \cf7 <<\cf2  id \cf7 <<\cf2  \cf4 " "\cf2  \cf7 <<\cf2  data[i].sender \cf7 <<\cf2  \cf4 " "\cf2  \cf7 <<\cf2  left;\par
+\tab\tab\tab files.close();\par
+\par
+\par
+\tab\tab\tab\cf6 ofstream\cf2  a;\par
+\par
+\par
+\par
+\tab\tab\tab data[i].timestamp = time(&data1Time);\par
+\par
+\tab\tab\tab creditcoin.addBlock(data[i]);\par
+\par
+\tab\tab\tab\cf5 if\cf2  (creditcoin.is_chain_valid() == 1)\par
+\tab\tab\tab\{\par
+\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\nthe transaction was successful "\cf2 ;\par
+\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "here is the receipt "\cf2 ;\par
+\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\namount: "\cf2  \cf7 <<\cf2  data[i].amount;\par
+\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\nreceiver: "\cf2  \cf7 <<\cf2  data[i].receiver;\par
+\tab\tab\tab\tab a.open(\cf4 "C:\\\\Users\\\\Manish Panchal\\\\Desktop\\\\thisisreceipt.txt"\cf2 , \cf6 ios\cf2 ::out | \cf6 ios\cf2 ::app);\par
+\tab\tab\tab\tab a \cf7 <<\cf2  \cf4 "block"\cf2  \cf7 <<\cf2  i \cf7 <<\cf2  endl;\par
+\tab\tab\tab\tab a \cf7 <<\cf2  \cf4 "the sender: "\cf2  \cf7 <<\cf2  data[i].sender \cf7 <<\cf2  endl;\par
+\tab\tab\tab\tab a \cf7 <<\cf2  \cf4 "the receiver: "\cf2  \cf7 <<\cf2  data[i].receiver \cf7 <<\cf2  endl;\par
+\tab\tab\tab\tab a \cf7 <<\cf2  \cf4 "the sender sent "\cf2  \cf7 <<\cf2  data[i].amount \cf7 <<\cf2  \cf4 " credit coins to the receiver."\cf2  \cf7 <<\cf2  endl;\par
+\par
+\par
+\tab\tab\tab\tab a.close();\par
+\par
+\par
+\tab\tab\tab\}\par
+\tab\tab\tab\cf5 else\cf2  \{\par
+\tab\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\nerror!!! "\cf2 ;\par
+\par
+\tab\tab\tab\}\par
+\par
+\par
+\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\ndo you want to continue(yes/no): "\cf2 ;\par
+\tab\tab\tab cin \cf7 >>\cf2  ch;\par
+\tab\tab\tab i++;\par
+\tab\tab\tab system(\cf4 "cls"\cf2 );\par
+\tab\tab\tab\cf5 if\cf2  (strcmp(ch, \cf4 "yes"\cf2 ) == 0 || strcmp(ch, \cf4 "Yes"\cf2 ) == 0)\par
+\tab\tab\tab\{\par
+\tab\tab\tab\tab system(\cf4 "cls"\cf2 );\par
+\par
+\tab\tab\tab\tab\cf5 goto\cf2  label2;\par
+\tab\tab\tab\}\par
+\par
+\par
+\par
+\par
+\tab\tab\} \cf5 while\cf2  (strcmp(ch, \cf4 "yes"\cf2 ) == 0 || strcmp(ch, \cf4 "Yes"\cf2 ) == 0);\par
+\tab\tab\cf5 goto\cf2  label5;\par
+\par
+\par
+\tab\}\par
+\par
+\tab\cf5 if\cf2  (chh == \cf4 'n'\cf2 )\par
+\tab\{\par
+\tab label6:\par
+\tab\tab\par
+\tab\tab\cf5 int\cf2  index;\par
+\tab\tab\cf5 int\cf2  money;\par
+\tab\tab\cf6 string\cf2  name;\par
+\tab\tab\cf6 ofstream\cf2  thefile;\par
+\tab\tab thefile.open(\cf4 "C:\\\\Users\\\\Manish Panchal\\\\Desktop\\\\users.txt"\cf2 , \cf6 ios\cf2 ::app);\par
+\tab\tab cout \cf7 <<\cf2  \cf4 "enter the id "\cf2 ;\par
+\tab\tab cin \cf7 >>\cf2  index;\par
+\tab\tab cout \cf7 <<\cf2  \cf4 "enter name "\cf2 ;\par
+\tab\tab cin \cf7 >>\cf2  name;\par
+\tab\tab cout \cf7 <<\cf2  \cf4 "enter the amount of money to deposit: "\cf2 ;\par
+\tab\tab cin \cf7 >>\cf2  money;\par
+\tab\tab thefile \cf7 <<\cf2  endl \cf7 <<\cf2  index \cf7 <<\cf2  \cf4 " "\cf2  \cf7 <<\cf2  name \cf7 <<\cf2  \cf4 " "\cf2  \cf7 <<\cf2  money;\par
+\tab\tab thefile.close();\par
+\par
+\par
+\par
+\par
+\tab\tab\cf5 char\cf2  w;\par
+\tab\tab cout \cf7 <<\cf2  \cf4 "now do you want to contitue (y/n): "\cf2 ;\par
+\tab\tab cin \cf7 >>\cf2  w;\par
+\tab\tab\cf5 if\cf2  (w == \cf4 'y'\cf2 )\par
+\tab\tab\{\par
+\tab\tab\tab system(\cf4 "cls"\cf2 );\par
+\tab\tab\tab\cf5 goto\cf2  label2;\par
+\par
+\tab\tab\}\par
+\tab\tab\cf5 else\cf2\par
+\tab\tab\{\par
+\tab\tab\tab system(\cf4 "cls"\cf2 );\par
+\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\t\\t\\t\\t!!!!!!WORLD BANK OF HEDIA CREDIT!!!!!!!"\cf2 ;\par
+\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\n"\cf2 ;\par
+\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\t\\t\\t\\t$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"\cf2 ;\par
+\tab\tab\tab cout \cf7 <<\cf2  \cf4 "\\n\\nthankyou for banking with us "\cf2 ;\par
+\tab\tab\tab cout \cf7 <<\cf2  endl;\par
+\tab\tab\tab exit(0);\par
+\par
+\tab\tab\}\par
+\tab\}\par
+\par
+\par
+\par
+\par
+label5:\par
+\tab system(\cf4 "cls"\cf2 );\par
+\tab cout \cf7 <<\cf2  \cf4 "\\t\\t\\t\\t!!!!!!WORLD BANK OF HEDIA CREDIT!!!!!!!"\cf2 ;\par
+\tab cout \cf7 <<\cf2  \cf4 "\\n"\cf2 ;\par
+\tab cout \cf7 <<\cf2  \cf4 "\\t\\t\\t\\t$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"\cf2 ;\par
+\tab cout \cf7 <<\cf2  \cf4 "\\n\\n Thankyou for banking with us "\cf2 ;\par
+\tab cout \cf7 <<\cf2  endl;\par
+\par
+\tab i++;\par
+\tab i = j;\par
+\par
+\par
+\par
+\tab\cf5 return\cf2  0;\par
+\par
+\}\par
+\par
+\cf1 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu\cf2\par
+\cf1 // Debug program: F5 or Debug > Start Debugging menu\cf2\par
+\par
+\cf1 // Tips for Getting Started: \cf2\par
+\cf1 //   1. Use the Solution Explorer window to add/manage files\cf2\par
+\cf1 //   2. Use the Team Explorer window to connect to source control\cf2\par
+\cf1 //   3. Use the Output window to see build output and other messages\cf2\par
+\cf1 //   4. Use the Error List window to view errors\cf2\par
+\cf1 //   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project\cf2\par
+\cf1 //   6. In the future, to open this project again, go to File > Open > Project and select the .sln file\cf2\par
+\cf0\f1\fs22\par
+}
+ 
